@@ -1,4 +1,5 @@
 using Persistence;
+using Core.CrossCuttingConcerns.Exceptions;
 using Application;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+if (app.Environment.IsProduction()) //development ortamýnda oldugunda detaylý hata fýrlatmasý için 
+    app.ConfigureCustomExceptionMiddleware();
 
 app.UseAuthorization();
 
