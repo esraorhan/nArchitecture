@@ -34,6 +34,7 @@ namespace Application.Features.Brands.Queries.GetListBrand
                 IPaginate<Brand> brands=await  _brandRepository.GetListAsync(index: request.PageRequest.Page, size: request.PageRequest.PageSize);
                 BrandListModel mappedBrandListModel =_mapper.Map<BrandListModel>(brands);
                 return mappedBrandListModel;
+
             }
         }
     }
