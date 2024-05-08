@@ -10,6 +10,8 @@ namespace Domain.Entities
     public class Brand : Entity
     {
         public string Name { get; set; }
+        public virtual ICollection<Model> Models { get; set; } // model sınıfı ile ilişkisi kurulmus oldu .
+                                                               // bir markanın birden fazla modeli olabilir.
         public Brand()
         {
                 
