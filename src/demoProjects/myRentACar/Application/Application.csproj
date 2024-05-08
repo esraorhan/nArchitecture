@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <Folder Include="Features\Brands\Contants\" />
-    <Folder Include="Features\Models\" />
+    <Folder Include="Features\Models\Commands\" />
+    <Folder Include="Features\Models\Contants\" />
+    <Folder Include="Features\Models\Rules\" />
   </ItemGroup>
 
   <ItemGroup>
