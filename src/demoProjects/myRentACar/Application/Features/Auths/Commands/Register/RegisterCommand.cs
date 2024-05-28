@@ -1,7 +1,11 @@
 ﻿using Application.Features.Auths.Dtos;
 using Application.Features.Auths.Rules;
+using Application.Services.AuthService;
 using Application.Services.Repositories;
 using Core.Security.Dtos;
+using Core.Security.Entities;
+using Core.Security.Hashing;
+using Core.Security.JWT;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -19,11 +23,46 @@ namespace Application.Features.Auths.Commands.Register
         {
             private readonly AuthBusinessRules _businessRules;
             private readonly IUserRepository _userRepository;
-            public Task<RegisteredDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
+            private readonly IAuthService _authService;
+
+            public RegisterCommandHandler(AuthBusinessRules businessRules, IUserRepository userRepository, IAuthService authService)
+            {
+                _businessRules = businessRules;
+                _userRepository = userRepository;
+                _authService = authService;
+            }
+
+            public async Task<RegisteredDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
             {
                 //token oluşturma kodlarını buraya yazılablir fakat login de gerektiği için generate etmek gerekir.
                 //bu yüzden servis yaklaşımı yapılacak.Service klasöründe =>
-                throw new NotImplementedException();
+               
+                await _businessRules.EmailCanNotBeDuplicatedWhenRegistered(request.UserForRegisterDto.Email);
+                byte[] passwordHash, passwordSalt; //out ile set etmiş olacağız.
+                HashingHelper.CreatePasswordHash(request.UserForRegisterDto.Password,out passwordHash,out passwordSalt);
+
+                User newUser = new()
+                {
+                    Email = request.UserForRegisterDto.Email,
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt,
+                    FirstName = request.UserForRegisterDto.FirstName,
+                    LastName = request.UserForRegisterDto.LastName,
+                    Status=true
+                };
+                User createdUser = await _userRepository.AddAsync(newUser);
+
+                AccessToken createdAccessToken = await _authService.CreateAccessToken(createdUser);
+                RefreshToken createdRefreshToken =await _authService.CreateRefreshToken(createdUser,request.IpAddress);
+                RefreshToken addedRefreshToken = await _authService.AddRefreshToken(createdRefreshToken);
+
+                RegisteredDto registeredDto = new()
+                {
+                    RefreshToken = addedRefreshToken,
+                    AccessToken = createdAccessToken,
+                };
+
+                return registeredDto;
             }
         }
     }

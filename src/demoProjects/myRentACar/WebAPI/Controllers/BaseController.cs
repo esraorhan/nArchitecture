@@ -8,6 +8,12 @@ namespace WebAPI.Controllers
         protected IMediator? Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
         private IMediator? _mediator;
 
+        protected string? GetIpAddress() //sadece inherit edilen yerlerde kullanılması için protected kullandık.
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For")) return Request.Headers["X-Forwarded-For"];
+            return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
 
+           
+        }
     }
 }
